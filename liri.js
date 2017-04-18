@@ -90,7 +90,16 @@ function spotifying(){
         
     }
  
-    //console.log(JSON.stringify(data[2], null, 1));
-    console.log(JSON.stringify(data.tracks.items[1].artists, null, 1));
+
+     console.log("Artist: ")
+    console.log(JSON.stringify(data.tracks.items[1].artists[0].name, null, 1));
+     console.log("Track: ")
+    console.log(userRequest);
+        console.log("album: ")
+    console.log(JSON.stringify(data.tracks.items[1].name, null, 1));
+       console.log("Preview Link: ")
+    console.log(JSON.stringify(data.tracks.items[1].preview_url, null, 1));
+    
+       
 });
 }
