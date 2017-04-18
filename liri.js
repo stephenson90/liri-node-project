@@ -4,7 +4,7 @@ var Twitter = require('twitter');
 var spotify = require('spotify');
 var userAction = process.argv[2];
 var userRequest ="";
-var client = keys.twitterKeys;
+
 
 var fs = require("fs");
 var output;
@@ -164,18 +164,32 @@ function randomify(){
 }
 
 function twitter(){
-	console.log("hello");
-	var params = {screen_name: '@RihadBouazizi', count: 20};
-client.get('statuses/user_timeline', function(error, tweets, response) {
+	var client = new Twitter(keys);
+
+	//console.log("hello");
+	var params = {screen_name: 'RihadBouazizi', count: 20};
+client.get('statuses/user_timeline', params, function(error, tweets, response) {
 	
   if(error){
    console.log(error);
 	}
 
-  console.log("My tweets: "+JSON.stringify(response, null,1));   
-  //console.log(response);  
+	for(var i = 0; i<20; i++){
 
-    fs.appendFile("log.txt",tweets, function(err) {
+		console.log("Created on: "+ tweets[i].created_at);
+
+  console.log("My tweets: "+tweets[i].text);   
+  //console.log(response);  
+  fs.appendFile("log.txt", "---------------------------<br>", function(err) {
+  
+  				if (err) {
+    		 		console.log(err);
+  				}  
+
+
+			});
+
+    fs.appendFile("log.txt",tweets[i].text, function(err) {
   
   if (err) {
     console.log(err);
@@ -183,7 +197,9 @@ client.get('statuses/user_timeline', function(error, tweets, response) {
 
 
 });
+}
 
 
 			});
-		}
+}
+		
