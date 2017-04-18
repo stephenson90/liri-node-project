@@ -1,12 +1,17 @@
 var request = require("request");
-var keys = require("./keys.js")
+var keys = require("./keys.js");
 var Twitter = require('twitter');
 var spotify = require('spotify');
-
 var userAction = process.argv[2];
-var userRequest =process.argv[3];
-//console.log(userRequest);
+var userRequest ="";
 var client = keys.twitterKeys;
+
+var fs = require("fs");
+var output;
+
+
+//console.log(userRequest);
+
 //console.log(client);
 
 switch(userAction){
@@ -21,23 +26,14 @@ switch(userAction){
 	case "movie-this":
 	movify();
 	break;
+
+	case "do-what-it-says":
+	randomify();
+	break;
 }
 
 
-function twitter(){
-	console.log("hello");
-	var params = {screen_name: '@RihadBouazizi', count: 20};
-client.get('statuses/user_timeline', function(error, tweets, response) {
-	
-  if(error){
-   console.log(error);
-	}
 
-  console.log("My tweets: "+JSON.stringify(response, null,1));   
-  //console.log(response);  
-
-			});
-		}
 
 		//console.log(process.argv.length);
 
@@ -46,15 +42,17 @@ function movify(){
 		omdb="http://www.omdbapi.com/?t=Mr.+Nobody&y=&plot=short&r=json&tomatoes=true";
 	}
 
-	for(var i = 4; i<process.argv.length; i++){
-	userRequest=userRequest+"+"+process.argv[i];
+	for(var i = 3; i<process.argv.length; i++){
+	userRequest= userRequest+"+"+process.argv[i];
 	var omdb = "http://www.omdbapi.com/?t="+userRequest+"&y=&plot=short&r=json&tomatoes=true";
 		
 	}
 	
-	//console.log(omdb);
+	//console.log(userRequest);
+	//console.log(process.argv);
 	
 	request(omdb, function(error, response, body) {
+		
 
    if (!error && response.statusCode === 200) {
    	console.log("Title: "+JSON.parse(body).Title);
@@ -66,6 +64,24 @@ function movify(){
     console.log("Featuring: "+JSON.parse(body).Actors);
     console.log("Rotten Tomatoes Rating: "+JSON.parse(body).tomatoRating);
     console.log("Rotten Tomatoes URL.: "+JSON.parse(body).tomatoURL);
+
+    fs.appendFile("log.txt", "---------------------------<br>", function(err) {
+  
+  				if (err) {
+    		 		console.log(err);
+  				}  
+
+
+			});
+
+    	fs.appendFile("log.txt",body, function(err) {
+  
+  			if (err) {
+    		return console.log(err);
+  			}  
+
+
+			});
 
 
       }
@@ -79,7 +95,7 @@ function spotifying(){
 		userRequest="The+Sign";
 	}
 
-	for(var i = 4; i<process.argv.length; i++){
+	for(var i = 3; i<process.argv.length; i++){
 	userRequest=userRequest+"+"+process.argv[i];
 			
 	}
@@ -88,18 +104,86 @@ function spotifying(){
     	if ( err ) {
         console.log('Error occurred: ' + err);
         
-    }
- 
+    } 
 
-     console.log("Artist: ")
+    	fs.appendFile("log.txt", "---------------------------<br>", function(err) {
+  
+  				if (err) {
+    		 		console.log(err);
+  				}  
+
+
+			});
+
+    	fs.appendFile("log.txt", JSON.stringify(data.tracks.items[1]), function(err) {
+  
+  				if (err) {
+    		 		console.log(err);
+  				}  
+
+
+			});
+
+    console.log("Artist: ")
     console.log(JSON.stringify(data.tracks.items[1].artists[0].name, null, 1));
-     console.log("Track: ")
-    console.log(userRequest);
-        console.log("album: ")
+    console.log("Track: ")
+    console.log( data.tracks.items[2].name);
+    console.log("album: ")
     console.log(JSON.stringify(data.tracks.items[1].name, null, 1));
-       console.log("Preview Link: ")
+    console.log("Preview Link: ")
     console.log(JSON.stringify(data.tracks.items[1].preview_url, null, 1));
     
        
 });
 }
+
+
+
+function randomify(){
+	fs.readFile("random.txt", "utf8", function(err, data) {
+
+		output = data.split(","); 
+		//console.log(output);
+	
+
+	
+		var randomSelect = Math.floor(Math.random()*2);
+   
+    if(randomSelect===1){
+    	userRequest=output[3];
+    	console.log(userRequest);
+    	movify();
+    }
+
+    else if (randomSelect===0){
+    	userRequest=output[1];
+    	spotifying();
+    }
+    });
+
+}
+
+function twitter(){
+	console.log("hello");
+	var params = {screen_name: '@RihadBouazizi', count: 20};
+client.get('statuses/user_timeline', function(error, tweets, response) {
+	
+  if(error){
+   console.log(error);
+	}
+
+  console.log("My tweets: "+JSON.stringify(response, null,1));   
+  //console.log(response);  
+
+    fs.appendFile("log.txt",tweets, function(err) {
+  
+  if (err) {
+    console.log(err);
+  }  
+
+
+});
+
+
+			});
+		}
